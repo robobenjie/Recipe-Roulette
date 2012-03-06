@@ -65,7 +65,13 @@
 (defn get-rating [page]
   (read-string (re-find #"\d+\.?\d*" (-> (first (html/select page [:p.reviewP :img])) :attrs :title))))
 (defn ingredient-string [i]
-  (str  (i :amount) (if (i :units) (str " " (i :units) " of") "") " " (i :ingredient) " " (if (i :prep) (str "(" (clojure.string/join ", " (i :prep)) ")")"")))
+  (str  (let [a (i :amount)] (cond
+			      (ratio? a) (str (quot a 1) " " (mod a 1))
+			      (zero? a) "some"
+			      :else a))
+	(if (i :units) (str " " (i :units) " of") "") " "
+	(i :ingredient) " "
+	(if (i :prep) (str "(" (clojure.string/join ", " (i :prep)) ")")"")))
 
 (defn pretty-print-ingredients [ingredients]
   (doseq [i ingredients]
