@@ -66,7 +66,7 @@
   (read-string (re-find #"\d+\.?\d*" (-> (first (html/select page [:p.reviewP :img])) :attrs :title))))
 (defn ingredient-string [i]
   (str  (let [a (i :amount)] (cond
-			      (ratio? a) (str (quot a 1) " " (mod a 1))
+			      (and (< 1 a) (ratio? a)) (str (quot a 1) " " (mod a 1))
 			      (zero? a) "some"
 			      :else a))
 	(if (i :units) (str " " (i :units) " of") "") " "

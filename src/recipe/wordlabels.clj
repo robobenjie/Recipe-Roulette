@@ -57,6 +57,56 @@
     sheet
     tub
     ))))
+(def to-cups
+  (let [conversion
+	(apply hash-map
+	 '(cup 1
+    ounce 0.125
+    tablespoon 1/16
+    pinch 0.001
+    clove .05
+    pound 2
+    jar 1
+    teaspoon 0.02
+    gram 0.004
+    pint 2
+    quart 4
+    gallon 16
+    head 3
+    package 2
+    container 2
+    can 1
+    half 1
+    bunch 2
+    slice 0.3
+    halves 1
+    oz 0.125
+    tbs 1/16
+    tsp 0.02
+    cp 1
+    pt 2
+    qt 4
+    lb 2
+    stick 1
+    cube 1
+    stalks 1
+    sprig 0.25
+    bottle 2
+    dash 0.03
+    packet 0.02
+    box 3
+    sheet 2
+    tub 6))]
+    (fn [{:keys [units, amount]}]
+      (println units amount)
+      (if (nil? units)
+	amount
+	(let [unit (clojure.string/replace units #"s$" "")]
+	  (if-let [c (conversion (symbol unit))]
+	    (* amount c)
+	    amount))))))
+
+
 (def prep-styles
   (into #{}
         (map str '(

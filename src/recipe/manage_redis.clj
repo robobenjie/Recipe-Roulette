@@ -1,5 +1,6 @@
 (ns recipe.manage-redis
-  (:use [recipe.scraperecipe] :reload)
+  (:use [recipe.scraperecipe] 
+	[recipe.wordlabels] :reload)
   (require [clojure.contrib.math]
 	   [recipe.heap-sort])
   (:import  [redis.clients.jedis Jedis JedisPool]))
@@ -126,15 +127,20 @@
 
 	 ret-ingredients (into #{} (n-best-fit 9 keywords))
 	 ret-recipe (map ingredient-string
-			 (map (fn [ingredient]
-				(let [keyword (first (reverse (sort-by
-							       #(P_k|i % ingredient)
-							       (filter
-								#(.sismember jedis (str ":key-set:" %) ingredient)
-								keywords))))]
-				  (read-string
-				   (.lindex jedis  (str ":keyword-ingredient-obj:" keyword ":" ingredient) 0))))
-			      (into keyword-match-ingredients ret-ingredients)))
+			 (reverse
+			  (sort-by #(to-cups %)
+				   (map (fn [ingredient]
+					  (let [keyword
+						(first
+						 (reverse
+						  (sort-by
+						   #(P_k|i % ingredient)
+						   (filter
+						    #(.sismember jedis (str ":key-set:" %) ingredient)
+						    keywords))))]
+					    (read-string
+					     (.lindex jedis  (str ":keyword-ingredient-obj:" keyword ":" ingredient) 0))))
+					(into keyword-match-ingredients ret-ingredients)))))
 	 ]
       (.returnResource *jedisPool* jedis)
      ret-recipe)))
