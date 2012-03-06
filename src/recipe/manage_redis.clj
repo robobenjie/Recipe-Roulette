@@ -5,9 +5,10 @@
 	   [recipe.heap-sort])
   (:import  [redis.clients.jedis Jedis JedisPool]))
 
+(def *jedisPool* (JedisPool. "127.0.0.1" 6379))
+
 (defn process-recipe-to-redis [the-recipe additional-keyword]
-  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
-	jedis (.getResource *jedisPool*)]
+  (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
     (let [keywords (into (if additional-keyword #{additional-keyword} #{}) (get-keywords the-recipe))
     	  ingredient-objs (map #(assoc % :servings (the-recipe :servings))(the-recipe :ingredients))
@@ -52,15 +53,13 @@
 
 
 (defn add-useless-keyword [keyword]
-  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
- 	 jedis (.getResource *jedisPool*)]
+  (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
     (.sadd jedis ":useless-keywords" keyword)
     (.returnResource *jedisPool* jedis)))
 
 (defn check-keyword [keyword]
-  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
-	jedis (.getResource *jedisPool*)]
+  (let [jedis (.getResource *jedisPool*)]
       (.select jedis 0)
       (let [retval
          (cond
@@ -77,16 +76,14 @@
 	    (doseq [r (map scrape-link urls)]
 	      (process-recipe-to-redis r keyword)))))
 (defn n-random-keywords [n]
-  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
-	jedis (.getResource *jedisPool*)]
+  (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
     (let [keywords (take n (repeatedly (fn [](.srandmember jedis ":all-keywords"))))]
       (.returnResource *jedisPool* jedis)
       keywords)))
 
 (defn construct-recipe [keywords]
-  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
-	jedis (.getResource *jedisPool*)]
+  (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
     (let[ingredients (filter #(< 2 (count %)) (apply vector (reduce #(into %1 %2) #{}
 					   (map #(.smembers jedis (str ":key-set:" %)) keywords))))

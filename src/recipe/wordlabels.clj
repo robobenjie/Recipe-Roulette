@@ -98,11 +98,9 @@
     sheet 2
     tub 6))]
     (fn [{:keys [units, amount]}]
-      (println units amount)
       (if (nil? units)
 	amount
 	(let [unit (clojure.string/replace units #"s$" "")]
-	  (println "conversion is" (conversion (symbol unit)) "of type" (type (conversion (symbol unit))))
 	  (if-let [c (conversion (symbol unit))]
 	    (* amount c)
 	    amount))))))

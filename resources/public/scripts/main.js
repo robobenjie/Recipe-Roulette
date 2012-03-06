@@ -3,7 +3,7 @@
   refresh = function() {
     var keyword_text;
     keyword_text = $('#main-input').val();
-    keyword_text = keyword_text.replace(/\'/, '');
+    keyword_text = keyword_text.replace(/[^a-zA-Z\'\s]/, '');
     keyword_text = keyword_text.replace(/\s+/g, '-');
     return window.location.href = keyword_text;
   };

@@ -9,15 +9,12 @@
             [compojure.handler :as handler]
             [compojure.response :as response]))
 
-(defn main-page [keyword-string]
-  (let [keywords (clojure.string/split (clojure.string/lower-case keyword-string)  #"-")
-        display-title  (clojure.string/join " " (map clojure.string/capitalize keywords))]
-
+(defn page [keywords]
+  (let [display-title  (clojure.string/join " " (map clojure.string/capitalize keywords))]
 	(doseq [unsearched (filter #(= :search (check-keyword %)) keywords)]
 	    (search-and-add-keyword unsearched))
 	(let [good-keywords (filter #(and (= :good (check-keyword %)) (not (boring-keywords %))) keywords)
 	      ingredients (construct-recipe good-keywords)]
-
     (html5
      [:head 
       [:title (str "Recipe-Roulette:" display-title)]
@@ -35,12 +32,16 @@
 	[:p [:button#make-recipe-btn {:class "large btn primary"} "Create Recipe"]]]]
      ))))
 
+
+(defn recipe-page [keyword-string]
+  (page (clojure.string/split (clojure.string/lower-case keyword-string)  #"-")))
+
 (defn random-page []
-  (main-page "Lemon")) ;(clojure.string/join " " (n-random-keywords 2))))
+  (page (reverse (sort-by #(re-find #"'s" %) (n-random-keywords 3)))))
 
 (defroutes main-routes
   (GET "/" [] (random-page))
-  (GET "/:keywords" [keywords] (main-page keywords))
+  (GET "/:keywords" [keywords] (recipe-page keywords))
   (route/resources "/")
   (route/not-found "404rd!"))
 
