@@ -17,6 +17,9 @@
       (do
       (println "adding recipe:" (the-recipe :title))
       (.sadd jedis ":all-urls" url)
+      (doseq [related-url (filter #(not (.sismember jedis ":all-urls" %)) (the-recipe :similar-links))]
+	(.sadd jedis ":unscraped-urls" related-url))
+
       (dorun (map #(.sadd jedis ":all-keywords" %) keywords))
       (dorun (map #(.sadd jedis ":all-ingredients" %) ingredients))
 
