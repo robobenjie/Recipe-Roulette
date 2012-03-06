@@ -10,6 +10,7 @@
             [compojure.response :as response]))
 
 (defn page [keywords]
+  (println "keys:" keywords)
   (let [display-title  (clojure.string/join " " (map clojure.string/capitalize keywords))]
 	(doseq [unsearched (filter #(= :search (check-keyword %)) keywords)]
 	    (search-and-add-keyword unsearched))
@@ -37,7 +38,7 @@
   (page (clojure.string/split (clojure.string/lower-case keyword-string)  #"-")))
 
 (defn random-page []
-  (page (reverse (sort-by #(re-find #"'s" %) (n-random-keywords 3)))))
+  (page (reverse (sort-by #(re-find #"'s" %) (map #(clojure.string/replace  % #"[\(\)\[\]]" "") (n-random-keywords 3))))))
 
 (defroutes main-routes
   (GET "/" [] (random-page))
