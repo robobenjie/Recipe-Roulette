@@ -75,7 +75,14 @@
 	(if (empty? urls)
 	    (add-useless-keyword keyword)
 	    (doseq [r (map scrape-link urls)]
-		(process-recipe-to-redis r keyword)))))
+	      (process-recipe-to-redis r keyword)))))
+(defn n-random-keywords [n]
+  (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
+	jedis (.getResource *jedisPool*)]
+    (.select jedis 0)
+    (let [keywords (take n (repeatedly (fn [](.srandmember jedis ":all-keywords"))))]
+      (.returnResource *jedisPool* jedis)
+      keywords)))
 
 (defn construct-recipe [keywords]
   (let [*jedisPool* (JedisPool. "127.0.0.1" 6379)
@@ -128,7 +135,7 @@
 	 ret-ingredients (into #{} (n-best-fit 9 keywords))
 	 ret-recipe (map ingredient-string
 			 (reverse
-			  (sort-by #(to-cups %)
+			  (sort-by to-cups 
 				   (map (fn [ingredient]
 					  (let [keyword
 						(first

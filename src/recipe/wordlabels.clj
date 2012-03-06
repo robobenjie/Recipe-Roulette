@@ -64,7 +64,7 @@
     ounce 0.125
     tablespoon 1/16
     pinch 0.001
-    clove .05
+    clove 0.05
     pound 2
     jar 1
     teaspoon 0.02
@@ -102,6 +102,7 @@
       (if (nil? units)
 	amount
 	(let [unit (clojure.string/replace units #"s$" "")]
+	  (println "conversion is" (conversion (symbol unit)) "of type" (type (conversion (symbol unit))))
 	  (if-let [c (conversion (symbol unit))]
 	    (* amount c)
 	    amount))))))

@@ -34,9 +34,12 @@
 	[:p [:input#main-input {:class "span3" :type "text"} ]]
 	[:p [:button#make-recipe-btn {:class "large btn primary"} "Create Recipe"]]]]
      ))))
-  
+
+(defn random-page []
+  (main-page "Lemon")) ;(clojure.string/join " " (n-random-keywords 2))))
 
 (defroutes main-routes
+  (GET "/" [] (random-page))
   (GET "/:keywords" [keywords] (main-page keywords))
   (route/resources "/")
   (route/not-found "404rd!"))
