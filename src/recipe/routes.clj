@@ -31,6 +31,7 @@
     (html5
      [:head 
       [:title (str "Recipe-Roulette:" display-title)]
+      [:link {:rel "icon" :type "image/png" :href "/images/favicon.png"}]
       (include-css "/css/bootstrap.css")
       (include-js "/scripts/jquery.js")
       (include-js "/scripts/main.js")

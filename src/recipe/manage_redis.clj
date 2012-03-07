@@ -187,6 +187,20 @@
       (def ingredient-objs (map #(assoc % :servings (recipe :servings))(recipe :ingredients)))
       (def ingredients (map :ingredient ingredient-objs)))
 
+
+(defn process-blob-to-redis [blob chunk-size wait]
+  (loop [this-chunk (take chunk-size blob)
+	 rest-blob (drop chunk-size blob)]
+    (if (empty? this-chunk)
+      (println "all-done")
+      (do (doseq [recipe this-chunk]
+	    (do
+	      (println (recipe :title))
+	      (process-recipe-to-redis recipe nil)))
+	  (Thread/sleep wait)
+	  (recur (take chunk-size rest-blob)
+		 (drop chunk-size rest-blob))))))
+
  (defmacro rs [& kw]
     `(doseq [line# (construct-recipe (map str '~kw))]
        (println line#)))
