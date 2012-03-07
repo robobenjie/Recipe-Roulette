@@ -84,7 +84,7 @@
 
 
 (defn search-and-add-keyword [keyword]
-    (let [urls (recipe-links keyword)]
+    (let [urls (take 4 (recipe-links keyword))]
 	(if (empty? urls)
 	    (add-useless-keyword keyword)
 	      (doseq [r (map scrape-link urls)]
