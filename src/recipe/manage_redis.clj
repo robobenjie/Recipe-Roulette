@@ -210,6 +210,7 @@
 	    recipe (scrape-link url)]
 	(println "total:" (.scard jedis ":all-urls") "Queue:" (.scard jedis ":unscraped-urls") (recipe :title))
 	(process-recipe-to-redis recipe nil)
+	(.returnResource *jedisPool* jedis)
 	(Thread/sleep 3000))
       (recur))))
   
