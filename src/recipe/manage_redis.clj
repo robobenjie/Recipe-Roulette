@@ -10,14 +10,16 @@
 (defn process-recipe-to-redis [the-recipe additional-keyword]
   (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
-    (let [keywords (into (if additional-keyword #{additional-keyword} #{}) (get-keywords the-recipe))
-    	  ingredient-objs (map #(assoc % :servings (the-recipe :servings))(the-recipe :ingredients))
-    	  ingredients (map :ingredient ingredient-objs)
-	  url (the-recipe :url)]
-      (if (.sismember jedis ":all-urls" url)
+	(let [url (the-recipe :url)
+	      already-scraped (.sismember jedis ":all-urls" url)
+	      keywords (into (if additional-keyword #{additional-keyword} #{})
+		             (if already-scraped #{} (get-keywords the-recipe)))
+    	      ingredient-objs (map #(assoc % :servings (the-recipe :servings))(the-recipe :ingredients))
+    	      ingredients (map :ingredient ingredient-objs)]
+      (if (and (empty? keywords) already-scraped)
 		(println "already scraped this recipe:" (the-recipe :title))
       (do
-      (println "adding recipe:" (the-recipe :title))
+      (println "adding recipe:" (the-recipe :title) "to keyset " keywords)
       (.sadd jedis ":all-urls" url)
       (doseq [related-url (filter #(not (.sismember jedis ":all-urls" %)) (the-recipe :similar-links))]
 	(.sadd jedis ":unscraped-urls" related-url))
