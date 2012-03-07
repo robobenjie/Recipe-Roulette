@@ -134,7 +134,7 @@
 
 
 (defn get-keywords [recipe]
-  (-> recipe :title clojure.string/lower-case (clojure.string/replace #"[\?\!,]" "") (clojure.string/split #"\s")))
+  (-> recipe :title clojure.string/lower-case (clojure.string/replace #"[\?\!,]" "") (clojure.string/split #"[\s-]")))
 
 
 (defn load-blob [filename]

@@ -10,6 +10,9 @@
   };
   $(document).ready(function() {
     $('#make-recipe-btn').on("click", refresh);
+    $('#random-btn').on("click", function() {
+      return window.location.href = random_title;
+    });
     $('#main-input').keyup(function(e) {
       if (e.which === 13) {
         return refresh();

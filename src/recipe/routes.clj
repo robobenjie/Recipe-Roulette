@@ -20,19 +20,21 @@
 	(if (empty? ingredients) "Gosh, I have no idea. Is that even food?"
 	    (into [:ul] (map #(vector :li %) ingredients)))))
 
+
 (defn page [keywords]
   (println "keys:" keywords)
   (let [display-title  (clojure.string/join " " (map clojure.string/capitalize keywords))
 	unsearched-keywords (filter #(= :search (check-keyword %)) keywords)
 	need-to-search (not (empty? unsearched-keywords))]
     (do
-      (start-lookup unsearched-keywords)
+      (.start (Thread. #(start-lookup unsearched-keywords)))
     (html5
      [:head 
       [:title (str "Recipe-Roulette:" display-title)]
       (include-css "/css/bootstrap.css")
       (include-js "/scripts/jquery.js")
       (include-js "/scripts/main.js")
+      [:script {:type "text/javascript"} (str "var random_title = \"" (clojure.string/join "-" (n-random-keywords 3)) "\";")]
       (if need-to-search
         (include-js "/scripts/searching.js") "")
       [:script {:type "text/javascript"} (str "var recipe_title_string = \"" (clojure.string/join "-" keywords) "\";")]]
@@ -51,14 +53,20 @@
 	]]
 	[:h3.lead "Make up a recipe name:"]
 	[:p [:input#main-input {:class "span3" :type "text"} ]]
-	[:p [:button#make-recipe-btn {:class "large btn primary"} "Create Recipe"]]]]))))
+	[:p [:button#make-recipe-btn {:class "large btn primary"} "Create Recipe"]
+	    " "
+	    [:button#random-btn {:class "large btn primary"} "Random Recipe"]]
+        [:hr {:style "margin-top: 50px;"}]
+	[:p.smalltext "This AI creates random recipes using data scoured from the internet. 
+	       It was built on a whim by Benjie Holson."][:p.smalltext "The source is available" 
+		[:a {:href "https://github.com/robobenjie/Recipe-Roulette"} " here"] " (in clojure and coffeescript)."]]]))))
 
 
 (defn recipe-page [keyword-string]
-  (page (clojure.string/split (clojure.string/lower-case keyword-string)  #"-")))
+  (page (clojure.string/split (clojure.string/lower-case (clojure.string/replace keyword-string #"[\(\)\[\]]" ""))  #"-")))
 
 (defn random-page []
-  (page (reverse (sort-by #(re-find #"'s" %) (map #(clojure.string/replace  % #"[\(\)\[\]]" "") (n-random-keywords 3))))))
+  (page (n-random-keywords 3)))
 
 (defn get-recently-scraped [keyword-string]
   (let [keywords (clojure.string/split (clojure.string/lower-case keyword-string)  #"-")

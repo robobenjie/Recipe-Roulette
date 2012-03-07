@@ -9,6 +9,8 @@ refresh = ->
 
 $(document).ready ->
   $('#make-recipe-btn').on "click", refresh
+  $('#random-btn').on "click", ->
+    window.location.href = random_title
   $('#main-input').keyup (e) ->
     refresh() if e.which is 13
   $('#main-input').focus()

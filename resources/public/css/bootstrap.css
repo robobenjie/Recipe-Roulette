@@ -4086,5 +4086,9 @@ footer.footer {
 }
 
 .recipe-title {
-    padding: 10px
+    padding: 10px;
+}
+
+.smalltext {
+    font-size: 12px;
 }

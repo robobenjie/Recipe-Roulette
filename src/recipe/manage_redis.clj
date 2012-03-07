@@ -96,7 +96,7 @@
     (.select jedis 0)
     (let [keywords (take n (repeatedly (fn [](.srandmember jedis ":all-keywords"))))]
       (.returnResource *jedisPool* jedis)
-      keywords)))
+     (reverse (sort-by #(re-find #"'s" %) (map #(clojure.string/replace  % #"[\(\)\[\]]" "") keywords))))))
 
 
 
