@@ -96,7 +96,8 @@
     (.select jedis 0)
     (let [keywords (take n (repeatedly (fn [](.srandmember jedis ":all-keywords"))))]
       (.returnResource *jedisPool* jedis)
-     (reverse (sort-by #(re-find #"'s" %) (map #(clojure.string/replace  % #"[\(\)\[\]]" "") keywords))))))
+      (reverse (sort-by #(re-find #"'s" %) (map #(clojure.string/replace  % #"[\(\)\[\]]" "") keywords))))))
+
 
 
 
@@ -200,6 +201,18 @@
 	  (Thread/sleep wait)
 	  (recur (take chunk-size rest-blob)
 		 (drop chunk-size rest-blob))))))
+
+(defn scrape-for-a-long-time []
+  (loop []
+    (let [jedis (.getResource *jedisPool*)]
+      (.select jedis 0)
+      (let [url (.spop jedis ":unscraped-urls")
+	    recipe (scrape-link url)]
+	(println "total:" (.scard jedis ":all-urls") "Queue:" (.scard jedis ":unscraped-urls") (recipe :title))
+	(process-recipe-to-redis recipe nil)
+	(Thread/sleep 3000))
+      (recur))))
+  
 
  (defmacro rs [& kw]
     `(doseq [line# (construct-recipe (map str '~kw))]
