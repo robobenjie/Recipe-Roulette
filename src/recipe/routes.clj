@@ -60,7 +60,13 @@
 	 [:hr {:style "margin-top: 50px;"}]
 	 [:p.smalltext "This AI creates random recipes using data scoured from the internet. 
 	       It was built on a whim by Benjie Holson."]
-	 [:p.smalltext "Built with clojure, coffeescript, redis and twitter-bootstrap using the superhero swatch from " [:a {:href "http://bootswatch.com/#swatches"} "bootswatch"]]
+	 [:p.smalltext "Built with "
+			    [:a {:href "http://clojure.org/"} "clojure"] ", " 
+			    [:a {:href "http://coffeescript.org/" } "coffeescript"]", " 
+			    [:a {:href "redis.io"} "redis"] " and " 
+			    [:a {:href "http://twitter.github.com/bootstrap/"} "twitter-bootstrap"] 
+			    " using the superhero swatch from " 
+			    [:a {:href "http://bootswatch.com/#swatches"} "bootswatch"]]
 	 [:p.smalltext "The source is available" 
 	  [:a {:href "https://github.com/robobenjie/Recipe-Roulette"} " here"] "."]
 	 ]]))))
