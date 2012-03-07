@@ -1,5 +1,6 @@
 (function() {
   var refresh;
+  window.display_search = function() {};
   refresh = function() {
     var keyword_text;
     keyword_text = $('#main-input').val();
@@ -9,10 +10,12 @@
   };
   $(document).ready(function() {
     $('#make-recipe-btn').on("click", refresh);
-    return $('#main-input').keyup(function(e) {
+    $('#main-input').keyup(function(e) {
       if (e.which === 13) {
         return refresh();
       }
     });
+    $('#main-input').focus();
+    return display_search();
   });
 }).call(this);

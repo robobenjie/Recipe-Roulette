@@ -381,6 +381,8 @@ ol ul {
 }
 ul {
   list-style: none;
+  text-align: left;
+  padding-left: 180px;
 }
 ol {
   list-style: decimal;
@@ -3904,7 +3906,7 @@ div.subnav.subnav-fixed .nav > li > a:hover, div.subnav.subnav-fixed .nav > li.a
 .breadcrumb .divider {
   color: #ece9d7;
 }
-.pagination ul {
+.pagination ul ul{
   background-color: #45515f;
   background-image: none;
   border-color: transparent;

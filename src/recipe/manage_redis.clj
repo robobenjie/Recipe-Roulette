@@ -46,11 +46,23 @@
 	(.incrBy jedis (str ":ingredient-ingredient-total:" ingredient) (long (count ingredients)))))))
       (.returnResource *jedisPool* jedis))))
 
-(defn probabilities [occurances events lambda count-event-types]
-  (let [occur (max lambda occurances)]
-    (/ (+ occur lambda)
-       (+ events (* count-event-types lambda)))))
 
+(defn recently-scraped [keyword]
+    (let [jedis (.getResource *jedisPool*)]
+	(.select jedis 0)
+	(let [r-key (str ":scraped-for-keyword:" keyword)
+		scraped-titles (.lrange jedis r-key 0 5)]
+	    (.expire jedis r-key 120)
+	    (.returnResource *jedisPool* jedis)
+	    scraped-titles)))
+
+(defn add-recently-scraped [keyword title]
+  (let [jedis (.getResource *jedisPool*)
+	r-key (str ":scraped-for-keyword:" keyword)]
+    (.select jedis 0)
+    (.lpush jedis r-key title)
+    (.expire jedis r-key 120)
+    (.returnResource *jedisPool* jedis)))
 
 (defn add-useless-keyword [keyword]
   (let [jedis (.getResource *jedisPool*)]
@@ -66,21 +78,32 @@
 	 (.sismember jedis ":all-keywords" keyword) :good
 	 (.sismember jedis ":useless-keywords" keyword) :bad
 	 :default :search)]
-      
       (.returnResource *jedisPool* jedis)
       retval)))
+
+
+
 (defn search-and-add-keyword [keyword]
     (let [urls (recipe-links keyword)]
 	(if (empty? urls)
 	    (add-useless-keyword keyword)
-	    (doseq [r (map scrape-link urls)]
-	      (process-recipe-to-redis r keyword)))))
+	      (doseq [r (map scrape-link urls)]
+	        (add-recently-scraped keyword (:title r))
+	        (process-recipe-to-redis r keyword)))))
+
 (defn n-random-keywords [n]
   (let [jedis (.getResource *jedisPool*)]
     (.select jedis 0)
     (let [keywords (take n (repeatedly (fn [](.srandmember jedis ":all-keywords"))))]
       (.returnResource *jedisPool* jedis)
       keywords)))
+
+
+
+(defn probabilities [occurances events lambda count-event-types]
+  (let [occur (max lambda occurances)]
+    (/ (+ occur lambda)
+       (+ events (* count-event-types lambda)))))
 
 (defn construct-recipe [keywords]
   (let [jedis (.getResource *jedisPool*)]
