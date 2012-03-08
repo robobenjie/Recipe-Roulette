@@ -69,6 +69,7 @@
 			    [:a {:href "http://bootswatch.com/#swatches"} "bootswatch"]]
 	 [:p.smalltext "The source is available" 
 	  [:a {:href "https://github.com/robobenjie/Recipe-Roulette"} " here"] "."]
+	 [:p.smalltext "Discuss on " [:a {:href "http://news.ycombinator.org/item?id=3681071"} "Hacker News"]]
 	 ]]))))
 
 
